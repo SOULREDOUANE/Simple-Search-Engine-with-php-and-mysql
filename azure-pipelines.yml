@@ -90,7 +90,7 @@ variables:
     jobName: 'azp-agent-job'
 stages: 
   - stage: Build_And_Test
-    dependsOn: Setup_Custom_Agent
+    # dependsOn: Setup_Custom_Agent
     jobs:
       - job: BuildTest
         pool:
