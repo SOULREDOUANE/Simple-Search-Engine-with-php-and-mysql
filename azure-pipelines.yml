@@ -96,8 +96,8 @@ stages:
         pool:
           name: 'default'
           demands:
-             - agent.name -equals dockeragent-docker-agent
-            # - agent.name -equals dockeragent-soul-agent
+            #  - agent.name -equals dockeragent-docker-agent
+            - agent.name -equals dockeragent-soul-agent
         steps:
           # - script: |
           #     sudo update-alternatives --set php /usr/bin/php$(phpVersion)
