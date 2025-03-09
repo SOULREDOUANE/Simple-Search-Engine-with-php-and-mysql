@@ -26,8 +26,27 @@ stages:
                 -Dsonar.projectKey=azure-devops \
                 -Dsonar.sources=. \
                 -Dsonar.host.url=$(sonarHostUrl) \
-                -Dsonar.login=$(sonarToken)
+                -Dsonar.login=$(sonarToken) \
+                > sonar-scan-output.txt 2>&1
             displayName: 'Run SonarQube Scan'
+          # Publish scan output as an artifact
+          - task: PublishBuildArtifacts@1
+            inputs:
+              pathToPublish: 'sonar-scan-output.txt'
+              artifactName: 'SonarQubeScanResults'
+              publishLocation: 'Container'
+            displayName: 'Publish SonarQube Scan Output'
+            
+          - script: |
+              echo "Extracting key metrics from scan output..."
+              cat sonar-scan-output.txt | grep "ANALYSIS SUCCESSFUL" || echo "Scan failed, check output for details"
+              # Example: Parse .scannerwork/report-task.txt if available
+              if [ -f .scannerwork/report-task.txt ]; then
+                cat .scannerwork/report-task.txt
+                TASK_URL=$(grep "ceTaskUrl" .scannerwork/report-task.txt | cut -d'=' -f2)
+                echo "##vso[task.logissue type=warning]SonarQube Task URL: $TASK_URL"
+              fi
+            displayName: 'Log SonarQube Metrics'
           - task: Docker@2
             displayName: 'Build Docker Image'
             inputs:
