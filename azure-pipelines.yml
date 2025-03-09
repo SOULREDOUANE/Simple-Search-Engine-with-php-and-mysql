@@ -9,6 +9,7 @@ variables:
     jobName: 'azp-agent-job'
     sonarHostUrl: 'http://sonarqube-sonarqube-lts.sonarqube.svc.cluster.local:9000'  # Fully qualified SonarQube service URL
     sonarToken: '95ed008304496205800ee04653a3189e62c3b9db'
+    TRIVY_SERVICE_URL: 'http://trivy-service.trivy.svc.cluster.local:5000/scan'
 stages: 
   - stage: Build_And_Test
     # dependsOn: Setup_Custom_Agent
@@ -30,23 +31,13 @@ stages:
                 > sonar-scan-output.txt 2>&1
             displayName: 'Run SonarQube Scan'
           # Publish scan output as an artifact
-          - task: PublishBuildArtifacts@1
-            inputs:
-              pathToPublish: 'sonar-scan-output.txt'
-              artifactName: 'SonarQubeScanResults'
-              publishLocation: 'Container'
-            displayName: 'Publish SonarQube Scan Output'
-            
-          - script: |
-              echo "Extracting key metrics from scan output..."
-              cat sonar-scan-output.txt | grep "ANALYSIS SUCCESSFUL" || echo "Scan failed, check output for details"
-              # Example: Parse .scannerwork/report-task.txt if available
-              if [ -f .scannerwork/report-task.txt ]; then
-                cat .scannerwork/report-task.txt
-                TASK_URL=$(grep "ceTaskUrl" .scannerwork/report-task.txt | cut -d'=' -f2)
-                echo "##vso[task.logissue type=warning]SonarQube Task URL: $TASK_URL"
-              fi
-            displayName: 'Log SonarQube Metrics'
+          # - task: PublishBuildArtifacts@1
+          #   inputs:
+          #     pathToPublish: 'sonar-scan-output.txt'
+          #     artifactName: 'SonarQubeScanResults'
+          #     publishLocation: 'Container'
+          #   displayName: 'Publish SonarQube Scan Output'
+
           - task: Docker@2
             displayName: 'Build Docker Image'
             inputs:
@@ -56,6 +47,20 @@ stages:
               containerRegistry: dockerhub-registry
               tags: |
                 $(tag)
+
+          - script: |
+              docker run --rm $(repositoryName):$(tag) trivy image --exit-code 0 --no-progress --format json $(repositoryName):$(tag) > trivy-scan-result.json
+            displayName: 'Scan Docker Image with Trivy CLI'
+
+          # Publish Trivy scan results as an artifact
+          - task: PublishBuildArtifacts@1
+            inputs:
+              pathToPublish: 'trivy-scan-result.json'
+              artifactName: 'TrivyScanResult'
+              publishLocation: 'Container'
+            displayName: 'Publish Trivy Scan Result'
+
+         
           - task: Docker@2
             displayName: 'Push Docker Image'
             inputs:
