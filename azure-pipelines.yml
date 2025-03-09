@@ -49,7 +49,7 @@ stages:
                 $(tag)
 
           - script: |
-              docker run --rm $(repositoryName):$(tag) trivy image --exit-code 0 --no-progress --format json $(repositoryName):$(tag) > trivy-scan-result.json
+              docker run --rm  aquasec/trivy:latest image --exit-code 0 --no-progress --format json $(repositoryName):$(tag) > trivy-scan-result.json
             displayName: 'Scan Docker Image with Trivy CLI'
 
           # Publish Trivy scan results as an artifact
