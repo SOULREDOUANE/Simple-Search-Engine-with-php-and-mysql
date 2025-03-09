@@ -84,7 +84,7 @@ trigger:
 
 variables:
     tag: '$(Build.BuildId)'
-    repositoryName: 'jesaregistry/jesa-php'
+    repositoryName: 'soulredouane/jesa-php'
     phpVersion: '8.2.27'
     k8sNamespace: 'jesa-med-namespace'
     jobName: 'azp-agent-job'
@@ -139,7 +139,7 @@ stages:
               command: build
               repository: $(repositoryName)
               dockerfile: '**/Dockerfile'
-              containerRegistry: acr-registry
+              containerRegistry: dockerhub-registry
               tags: |
                 $(tag)
           - task: Docker@2
@@ -147,7 +147,7 @@ stages:
             inputs:
               command: push
               repository: $(repositoryName)
-              containerRegistry: acr-registry
+              containerRegistry: dockerhub-registry
               tags: |
                 $(tag)
                 
