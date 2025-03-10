@@ -60,7 +60,7 @@ stages:
           name: 'default'
           demands:
             #  - agent.name -equals dockeragent-docker-agent
-            - agent.name -equals dockeragent-soul-agent
+            - agent.name -equals jesa-med-job-agent
         steps:
           # - script: |
           #     sonar-scanner \
