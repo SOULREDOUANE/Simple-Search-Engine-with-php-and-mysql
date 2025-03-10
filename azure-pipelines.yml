@@ -1,16 +1,56 @@
 
 trigger:
   - main
+resources:
+  repositories:
+    - repository: k8s_agent_repo          # identifier to use in checkout
+      type: github
+      endpoint: 'github-repo'
+      name: SOULREDOUANE/jesa-k8s-agent  # your repo name
+      ref: main 
 variables:
     tag: '$(Build.BuildId)'
     repositoryName: 'soulredouane/jesa-php'
     phpVersion: '8.2.27'
-    k8sNamespace: 'jesa-med-namespace'
+    k8sNamespace: 'jesa-med-ns'
     jobName: 'azp-agent-job'
     sonarHostUrl: 'http://sonarqube-sonarqube-lts.sonarqube.svc.cluster.local:9000'  # Fully qualified SonarQube service URL
     sonarToken: '95ed008304496205800ee04653a3189e62c3b9db'
     TRIVY_SERVICE_URL: 'http://trivy-service.trivy.svc.cluster.local:5000/scan'
 stages: 
+  - stage: Setup_Custom_Agent
+    jobs:
+    - job: CreateK8sAgent
+      # pool:
+      #   vmImage: 'ubuntu-latest'  # Start with Microsoft-hosted agent
+      pool:
+        name: 'default'
+        demands:
+          - agent.name -equals always-agent
+      steps:
+      - checkout: k8s_agent_repo
+      - task: Bash@3
+        inputs:
+          targetType: 'inline'
+          script: |
+            kubectl apply -f $(System.DefaultWorkingDirectory)/k8s_manifests/agent-job.yml
+      # Wait for agent to be ready
+      - bash: |
+          MAX_RETRIES=45
+          RETRY_INTERVAL=10
+          for ((i=1; i<=MAX_RETRIES; i++)); do
+            RUNNING=$(kubectl get job $(jobName) -n $(k8sNamespace) -o jsonpath='{.status.active}')
+            if [ "$RUNNING" == "1" ]; then
+              echo "Agent is running!"
+              exit 0
+            fi
+            echo "Waiting for agent to be ready... Attempt $i/$MAX_RETRIES"
+            sleep $RETRY_INTERVAL
+          done
+          echo "Warning: Agent readiness check timed out, but continuing anyway..."
+          exit 0  # Exit with success even if timeout
+        displayName: 'Wait for K8s agent to be ready'
+
   - stage: Build_And_Test
     # dependsOn: Setup_Custom_Agent
     jobs:
