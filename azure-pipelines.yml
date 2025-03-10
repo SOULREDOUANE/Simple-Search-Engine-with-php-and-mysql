@@ -88,5 +88,5 @@ stages:
               commands: |
                 docker pull $(repositoryName):$(tag)
                 # docker stop jesa-php-container || true
-                docker rm jesa-php-container || true
+                # docker rm jesa-php-container || true
                 docker run -d --name jesa-php-container -p 8080:80 $(repositoryName):$(tag)
