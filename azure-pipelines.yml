@@ -15,8 +15,8 @@ variables:
     k8sNamespace: 'jesa-med-ns'
     jobName: 'azp-agent-job'
     sonarHostUrl: 'http://sonarqube-sonarqube-lts.sonarqube.svc.cluster.local:9000'  # Fully qualified SonarQube service URL
-    sonarToken: '95ed008304496205800ee04653a3189e62c3b9db'
-    TRIVY_SERVICE_URL: 'http://trivy-service.trivy.svc.cluster.local:5000/scan'
+    sonarToken: '088736885d6f6fa531ab2a2bbb2e8efc686e8626'
+    # TRIVY_SERVICE_URL: 'http://trivy-service.trivy.svc.cluster.local:5000/scan'
 stages: 
   - stage: Setup_Custom_Agent
     jobs:
@@ -62,21 +62,21 @@ stages:
             #  - agent.name -equals dockeragent-docker-agent
             - agent.name -equals jesa-med-job-agent
         steps:
-          # - script: |
-          #     sonar-scanner \
-          #       -Dsonar.projectKey=azure-devops \
-          #       -Dsonar.sources=. \
-          #       -Dsonar.host.url=$(sonarHostUrl) \
-          #       -Dsonar.login=$(sonarToken) \
-          #       > sonar-scan-output.txt 2>&1
-          #   displayName: 'Run SonarQube Scan'
-          # Publish scan output as an artifact
-          # - task: PublishBuildArtifacts@1
-          #   inputs:
-          #     pathToPublish: 'sonar-scan-output.txt'
-          #     artifactName: 'SonarQubeScanResults'
-          #     publishLocation: 'Container'
-          #   displayName: 'Publish SonarQube Scan Output'
+          - script: |
+              sonar-scanner \
+                -Dsonar.projectKey=php-projec \
+                -Dsonar.sources=. \
+                -Dsonar.host.url=$(sonarHostUrl) \
+                -Dsonar.login=$(sonarToken) \
+                > sonar-scan-output.txt 2>&1
+            displayName: 'Run SonarQube Scan'
+          #Publish scan output as an artifact
+          - task: PublishBuildArtifacts@1
+            inputs:
+              pathToPublish: 'sonar-scan-output.txt'
+              artifactName: 'SonarQubeScanResults'
+              publishLocation: 'Container'
+            displayName: 'Publish SonarQube Scan Output'
 
           - task: Docker@2
             displayName: 'Build Docker Image'
@@ -88,17 +88,17 @@ stages:
               tags: |
                 $(tag)
 
-          # - script: |
-          #     docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image --exit-code 0 --no-progress --format json $(repositoryName):$(tag) > trivy-scan-result.json
-          #   displayName: 'Scan Docker Image with Trivy CLI'
+          - script: |
+              docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image --exit-code 0 --no-progress --format json $(repositoryName):$(tag) > trivy-scan-result.json
+            displayName: 'Scan Docker Image with Trivy CLI'
 
           # Publish Trivy scan results as an artifact
-          # - task: PublishBuildArtifacts@1
-          #   inputs:
-          #     pathToPublish: 'trivy-scan-result.json'
-          #     artifactName: 'TrivyScanResult'
-          #     publishLocation: 'Container'
-          #   displayName: 'Publish Trivy Scan Result'
+          - task: PublishBuildArtifacts@1
+            inputs:
+              pathToPublish: 'trivy-scan-result.json'
+              artifactName: 'TrivyScanResult'
+              publishLocation: 'Container'
+            displayName: 'Publish Trivy Scan Result'
 
          
           - task: Docker@2
