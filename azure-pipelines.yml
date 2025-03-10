@@ -22,14 +22,14 @@ stages:
             #  - agent.name -equals dockeragent-docker-agent
             - agent.name -equals dockeragent-soul-agent
         steps:
-          - script: |
-              sonar-scanner \
-                -Dsonar.projectKey=azure-devops \
-                -Dsonar.sources=. \
-                -Dsonar.host.url=$(sonarHostUrl) \
-                -Dsonar.login=$(sonarToken) \
-                > sonar-scan-output.txt 2>&1
-            displayName: 'Run SonarQube Scan'
+          # - script: |
+          #     sonar-scanner \
+          #       -Dsonar.projectKey=azure-devops \
+          #       -Dsonar.sources=. \
+          #       -Dsonar.host.url=$(sonarHostUrl) \
+          #       -Dsonar.login=$(sonarToken) \
+          #       > sonar-scan-output.txt 2>&1
+          #   displayName: 'Run SonarQube Scan'
           # Publish scan output as an artifact
           # - task: PublishBuildArtifacts@1
           #   inputs:
@@ -78,7 +78,7 @@ stages:
         pool:
           name: 'default'
           demands:
-            - agent.name -equals dssh-deploy-agent
+            - agent.name -equals  dockeragent-soul-agent
         steps:
           - task: SSH@0
             displayName: 'Deploy to Dev Server'
