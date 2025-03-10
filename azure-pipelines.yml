@@ -78,7 +78,7 @@ stages:
         pool:
           name: 'default'
           demands:
-            - agent.name -equals dockeragent-soul-agent
+            - agent.name -equals dssh-deploy-agent
         steps:
           - task: SSH@0
             displayName: 'Deploy to Dev Server'
