@@ -118,7 +118,7 @@ stages:
         pool:
           name: 'default'
           demands:
-            - agent.name -equals  dockeragent-soul-agent
+            - agent.name -equals  jesa-med-job-agent
         steps:
           - task: SSH@0
             displayName: 'Deploy to Dev Server'
@@ -127,6 +127,21 @@ stages:
               runOptions: 'commands'
               commands: |
                 docker pull $(repositoryName):$(tag)
-                # docker stop jesa-php-container || true
-                # docker rm jesa-php-container || true
+                docker rm -f jesa-php-container || true
                 docker run -d --name jesa-php-container -p 8080:80 $(repositoryName):$(tag)
+  - stage: CleanUP_Job_Agent
+    jobs:
+    - job: DeleteAgentJob
+      # pool:
+      #   vmImage: 'ubuntu-latest'  # Start with Microsoft-hosted agent
+      pool:
+        name: 'default'
+        demands:
+          - agent.name -equals always-agent
+      steps:
+      - checkout: k8s_agent_repo
+      - task: Bash@3
+        inputs:
+          targetType: 'inline'
+          script: |
+            kubectl delete -f $(System.DefaultWorkingDirectory)/k8s_manifests/agent-job.yml
