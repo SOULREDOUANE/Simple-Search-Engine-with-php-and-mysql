@@ -70,3 +70,23 @@ stages:
               tags: |
                 $(tag)
                 
+  - stage: Deploy
+    dependsOn: Build_And_Test
+    condition: succeeded()
+    jobs:
+      - job: DeployToDev
+        pool:
+          name: 'default'
+          demands:
+            - agent.name -equals dockeragent-soul-agent
+        steps:
+          - task: SSH@0
+            displayName: 'Deploy to Dev Server'
+            inputs:
+              sshEndpoint: 'jesa-med-ssh'
+              runOptions: 'commands'
+              commands: |
+                docker pull $(repositoryName):$(tag)
+                docker stop jesa-php-container || true
+                docker rm jesa-php-container || true
+                docker run -d --name jesa-php-container -p 8080:80 $(repositoryName):$(tag)
