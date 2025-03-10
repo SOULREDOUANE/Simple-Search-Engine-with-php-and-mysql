@@ -11,17 +11,17 @@ variables:
     sonarToken: '95ed008304496205800ee04653a3189e62c3b9db'
     TRIVY_SERVICE_URL: 'http://trivy-service.trivy.svc.cluster.local:5000/scan'
 stages: 
-  - stage: Build_And_Test
-    # dependsOn: Setup_Custom_Agent
-    jobs:
+  # - stage: Build_And_Test
+  #   # dependsOn: Setup_Custom_Agent
+  #   jobs:
       
-      - job: BuildTest
-        pool:
-          name: 'default'
-          demands:
-            #  - agent.name -equals dockeragent-docker-agent
-            - agent.name -equals dockeragent-soul-agent
-        steps:
+  #     - job: BuildTest
+  #       pool:
+  #         name: 'default'
+  #         demands:
+  #           #  - agent.name -equals dockeragent-docker-agent
+  #           - agent.name -equals dockeragent-soul-agent
+  #       steps:
           # - script: |
           #     sonar-scanner \
           #       -Dsonar.projectKey=azure-devops \
@@ -38,15 +38,15 @@ stages:
           #     publishLocation: 'Container'
           #   displayName: 'Publish SonarQube Scan Output'
 
-          - task: Docker@2
-            displayName: 'Build Docker Image'
-            inputs:
-              command: build
-              repository: $(repositoryName)
-              dockerfile: '**/Dockerfile'
-              containerRegistry: dockerhub-registry
-              tags: |
-                $(tag)
+          # - task: Docker@2
+          #   displayName: 'Build Docker Image'
+          #   inputs:
+          #     command: build
+          #     repository: $(repositoryName)
+          #     dockerfile: '**/Dockerfile'
+          #     containerRegistry: dockerhub-registry
+          #     tags: |
+          #       $(tag)
 
           # - script: |
           #     docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image --exit-code 0 --no-progress --format json $(repositoryName):$(tag) > trivy-scan-result.json
@@ -61,18 +61,18 @@ stages:
           #   displayName: 'Publish Trivy Scan Result'
 
          
-          - task: Docker@2
-            displayName: 'Push Docker Image'
-            inputs:
-              command: push
-              repository: $(repositoryName)
-              containerRegistry: dockerhub-registry
-              tags: |
-                $(tag)
+          # - task: Docker@2
+          #   displayName: 'Push Docker Image'
+          #   inputs:
+          #     command: push
+          #     repository: $(repositoryName)
+          #     containerRegistry: dockerhub-registry
+          #     tags: |
+          #       $(tag)
                 
   - stage: Deploy
-    dependsOn: Build_And_Test
-    condition: succeeded()
+    # dependsOn: Build_And_Test
+    # condition: succeeded()
     jobs:
       - job: DeployToDev
         pool:
