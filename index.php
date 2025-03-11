@@ -44,16 +44,16 @@ if(!isset($_GET['s'])){
     /*
     $sE = new search();
     $sE->host = 'localhost';
-    $sE->user = 'root';
-    $sE->pass = '';
-    $sE->db = 'search';
+    $sE->user = 'user';
+    $sE->pass = 'password';
+    $sE->db = 'db';
     $sE->connect('','','','');
     $sE->key = $s;
     while($data=$sE->results()){
         echo $data['title'];
     }*/
     #$con = mysqli_connect('localhost:3306','root','','search');
-    $con = mysqli_connect('db','user','password','search');
+    $con = mysqli_connect('localhost','user','password','db');
     $sql = mysqli_query($con, "SELECT * FROM data WHERE title LIKE '%$s%' OR description LIKE '%$s%' OR url LIKE '%$s%' ORDER BY ranking DESC");
     $row = mysqli_num_rows($sql);
     if($row == 0){
