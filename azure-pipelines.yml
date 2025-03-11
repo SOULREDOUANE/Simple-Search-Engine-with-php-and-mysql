@@ -14,8 +14,8 @@ variables:
     phpVersion: '8.2.27'
     k8sNamespace: 'jesa-med-ns'
     jobName: 'azp-agent-job'
-    sonarHostUrl: 'http://sonarqube-sonarqube-lts.sonarqube.svc.cluster.local:9000'  # Fully qualified SonarQube service URL
-    sonarToken: '088736885d6f6fa531ab2a2bbb2e8efc686e8626'
+    # sonarHostUrl: 'http://sonarqube-sonarqube-lts.sonarqube.svc.cluster.local:9000'  # Fully qualified SonarQube service URL
+    # sonarToken: '088736885d6f6fa531ab2a2bbb2e8efc686e8626'
     # TRIVY_SERVICE_URL: 'http://trivy-service.trivy.svc.cluster.local:5000/scan'
 stages: 
   - stage: Setup_Custom_Agent
@@ -127,7 +127,7 @@ stages:
               runOptions: 'commands'
               commands: |
                 docker pull $(repositoryName):$(tag)
-                # docker rm -f jesa-php-container || true
+                docker rm -f jesa-php-container || true
                 docker run -d --name jesa-php-container -p 8080:80 $(repositoryName):$(tag)
   - stage: CleanUP_Job_Agent
     jobs:
