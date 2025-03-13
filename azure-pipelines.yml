@@ -33,6 +33,8 @@ stages:
         inputs:
           targetType: 'inline'
           script: |
+            kubectl create configmap report-config --from-literal=REPORT_ID="$REPORT_ID"
+            kubectl apply -f $(System.DefaultWorkingDirectory)/k8s_manifests/owasp-job.yaml
             kubectl apply -f $(System.DefaultWorkingDirectory)/k8s_manifests/agent-job.yml
       # Wait for agent to be ready
       - bash: |
