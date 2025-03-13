@@ -53,7 +53,7 @@ stages:
             kubectl wait --for=condition=complete job/download-report-job -n default --timeout=5m || kubectl wait --for=condition=failed job/download-report-job -n default --timeout=5m
             
             # Copy the artifact from the pod to the agent
-            POD_NAME=$(kubectl get pod -l job-name=dependency-check-job -n $(k8sNamespace) -o jsonpath="{.items[0].metadata.name}")
+            POD_NAME=$(kubectl get pod -l job-name=dependency-check-job -n default -o jsonpath="{.items[0].metadata.name}")
             #$(kubectl get pod -l job-name=download-report-job -n default -o jsonpath="{.items[0].metadata.name}")
             kubectl cp ${POD_NAME}:/output/dependency-check-report $(System.ArtifactsDirectory)/dependency-check-report -n default
                 #Publish scan output as an artifact
