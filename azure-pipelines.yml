@@ -33,6 +33,9 @@ stages:
         inputs:
           targetType: 'inline'
           script: |
+            # Use the pipeline variable 'tag' to set REPORT_ID
+            REPORT_ID="jesa-med-$(tag)"
+            echo "Generated REPORT_ID: $REPORT_ID"
             kubectl create configmap report-config --from-literal=REPORT_ID="$REPORT_ID" -n default
             kubectl apply -f $(System.DefaultWorkingDirectory)/k8s_manifests/owasp-job.yaml
             kubectl apply -f $(System.DefaultWorkingDirectory)/k8s_manifests/agent-job.yml
