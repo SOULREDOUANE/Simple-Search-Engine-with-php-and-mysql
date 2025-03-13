@@ -57,23 +57,6 @@ stages:
           echo "Warning: Agent readiness check timed out, but continuing anyway..."
           exit 0  # Exit with success even if timeout
         displayName: 'Wait for K8s agent to be ready'
-      - task: Bash@3
-        inputs:
-          targetType: 'inline'
-          script: |
-            # Wait for completion
-            kubectl wait --for=condition=complete job/download-report-job -n default --timeout=5m || kubectl wait --for=condition=failed job/download-report-job -n default --timeout=5m
-              
-              # Copy the artifact from the pod to the agent
-              POD_NAME=download-report-job 
-              #$(kubectl get pod -l job-name=download-report-job -n default -o jsonpath="{.items[0].metadata.name}")
-              kubectl cp ${POD_NAME}:/output/dependency-check-report $(System.ArtifactsDirectory)/dependency-check-report -n default
-                  #Publish scan output as an artifact
-      - task: PublishBuildArtifacts@1
-        inputs:
-          pathToPublish: '$(System.ArtifactsDirectory)/dependency-check-report'
-          artifactName: 'dependency-check-report'
-          publishLocation: 'Container'
 
   - stage: Build_And_Test
     # dependsOn: Setup_Custom_Agent
@@ -94,23 +77,25 @@ stages:
                 -Dsonar.login=$(sonarToken) \
                 > sonar-scan-output.txt 2>&1
             displayName: 'Run SonarQube Scan'
-          # - task: Bash@3
-          #   inputs:
-          #     targetType: 'inline'
-          #     script: |
-          #       # Wait for completion
-          #       kubectl wait --for=condition=complete job/download-report-job -n default --timeout=5m || kubectl wait --for=condition=failed job/download-report-job -n default --timeout=5m
+          - task: Bash@3
+            inputs:
+              targetType: 'inline'
+              script: |
+                # Wait for completion
+                kubectl apply -f $(System.DefaultWorkingDirectory)/k8s_manifests/report-downloader.yaml -n default
+
+                kubectl wait --for=condition=complete job/download-report-job -n default --timeout=5m || kubectl wait --for=condition=failed job/download-report-job -n default --timeout=5m
                 
-          #       # Copy the artifact from the pod to the agent
-          #       POD_NAME=download-report-job 
-          #       #$(kubectl get pod -l job-name=download-report-job -n default -o jsonpath="{.items[0].metadata.name}")
-          #       kubectl cp ${POD_NAME}:/output/dependency-check-report $(System.ArtifactsDirectory)/dependency-check-report -n default
-          #           #Publish scan output as an artifact
-          # - task: PublishBuildArtifacts@1
-          #   inputs:
-          #     pathToPublish: '$(System.ArtifactsDirectory)/dependency-check-report'
-          #     artifactName: 'dependency-check-report'
-          #     publishLocation: 'Container'
+                # Copy the artifact from the pod to the agent
+                POD_NAME=$(kubectl get pod -l job-name=dependency-check-job -n $(k8sNamespace) -o jsonpath="{.items[0].metadata.name}")
+                #$(kubectl get pod -l job-name=download-report-job -n default -o jsonpath="{.items[0].metadata.name}")
+                kubectl cp ${POD_NAME}:/output/dependency-check-report $(System.ArtifactsDirectory)/dependency-check-report -n default
+                    #Publish scan output as an artifact
+          - task: PublishBuildArtifacts@1
+            inputs:
+              pathToPublish: '$(System.ArtifactsDirectory)/dependency-check-report'
+              artifactName: 'dependency-check-report'
+              publishLocation: 'Container'
           - task: PublishBuildArtifacts@1
             inputs:
               pathToPublish: 'sonar-scan-output.txt'
