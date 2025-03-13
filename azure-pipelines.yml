@@ -46,6 +46,7 @@ stages:
         inputs:
           targetType: 'inline'
           script: |
+            sleep 10
             # Wait for completion
             kubectl apply -f $(System.DefaultWorkingDirectory)/k8s_manifests/report-downloader.yaml -n default
 
