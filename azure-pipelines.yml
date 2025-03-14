@@ -42,29 +42,29 @@ stages:
             kubectl apply -f $(System.DefaultWorkingDirectory)/k8s_manifests/owasp-job.yaml
             kubectl apply -f $(System.DefaultWorkingDirectory)/k8s_manifests/agent-job.yml
       # Wait for agent to be ready
-      # - task: Bash@3
-      #   inputs:
-      #     targetType: 'inline'
-      #     script: |
-      #       kubectl wait --for=condition=complete job/dependency-check-job -n default --timeout=10m || kubectl wait --for=condition=failed job/dependency-check-job -n default --timeout=10m
+      - task: Bash@3
+        inputs:
+          targetType: 'inline'
+          script: |
+            kubectl wait --for=condition=complete job/dependency-check-job -n default --timeout=10m || kubectl wait --for=condition=failed job/dependency-check-job -n default --timeout=10m
 
-      #       kubectl apply -f $(System.DefaultWorkingDirectory)/k8s_manifests/report-downloader.yaml -n default
+            kubectl apply -f $(System.DefaultWorkingDirectory)/k8s_manifests/report-downloader.yaml -n default
 
-      #       kubectl get pod/download-report-pod -n default || { echo "Failed to create download-report-pod"; exit 1; }
-      #       kubectl wait --for=condition=Ready pod/download-report-pod -n default --timeout=5m
+            kubectl get pod/download-report-pod -n default || { echo "Failed to create download-report-pod"; exit 1; }
+            kubectl wait --for=condition=Ready pod/download-report-pod -n default --timeout=5m
 
-      #       DOWNLOAD_POD_NAME=download-report-pod
-      #       if [ -z "$DOWNLOAD_POD_NAME" ]; then
-      #         echo "Error: No pod found for download-report-pod. Listing all pods for debugging:"
-      #         kubectl get pods -n default
-      #         exit 1
-      #       fi
+            DOWNLOAD_POD_NAME=download-report-pod
+            if [ -z "$DOWNLOAD_POD_NAME" ]; then
+              echo "Error: No pod found for download-report-pod. Listing all pods for debugging:"
+              kubectl get pods -n default
+              exit 1
+            fi
             
-      #       echo "Download-Report Pod name: $DOWNLOAD_POD_NAME"
-      #       kubectl logs $DOWNLOAD_POD_NAME -n default
-      #       kubectl cp ${DOWNLOAD_POD_NAME}:/output/dependency-check-report $(System.ArtifactsDirectory)/dependency-check-report -n default
+            echo "Download-Report Pod name: $DOWNLOAD_POD_NAME"
+            kubectl logs $DOWNLOAD_POD_NAME -n default
+            kubectl cp ${DOWNLOAD_POD_NAME}:/output/dependency-check-report $(System.ArtifactsDirectory)/dependency-check-report -n default
             
-      #       kubectl delete pod/download-report-pod -n default --force --grace-period=0
+            kubectl delete pod/download-report-pod -n default --force --grace-period=0
           
       - task: PublishBuildArtifacts@1
         inputs:
