@@ -98,21 +98,21 @@ stages:
             #  - agent.name -equals dockeragent-docker-agent
             - agent.name -equals jesa-med-job-agent
         steps:
-          - script: |
-              sonar-scanner \
-                -Dsonar.projectKey=php-projec \
-                -Dsonar.sources=. \
-                -Dsonar.host.url=$(sonarHostUrl) \
-                -Dsonar.login=$(sonarToken) \
-                > sonar-scan-output.txt 2>&1
-            displayName: 'Run SonarQube Scan'
+          # - script: |
+          #     sonar-scanner \
+          #       -Dsonar.projectKey=php-projec \
+          #       -Dsonar.sources=. \
+          #       -Dsonar.host.url=$(sonarHostUrl) \
+          #       -Dsonar.login=$(sonarToken) \
+          #       > sonar-scan-output.txt 2>&1
+          #   displayName: 'Run SonarQube Scan'
           
-          - task: PublishBuildArtifacts@1
-            inputs:
-              pathToPublish: 'sonar-scan-output.txt'
-              artifactName: 'SonarQubeScanResults'
-              publishLocation: 'Container'
-            displayName: 'Publish SonarQube Scan Output'
+          # - task: PublishBuildArtifacts@1
+          #   inputs:
+          #     pathToPublish: 'sonar-scan-output.txt'
+          #     artifactName: 'SonarQubeScanResults'
+          #     publishLocation: 'Container'
+          #   displayName: 'Publish SonarQube Scan Output'
 
           - task: Docker@2
             displayName: 'Build Docker Image'
@@ -124,17 +124,17 @@ stages:
               tags: |
                 $(tag)
 
-          - script: |
-              docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image --exit-code 0 --no-progress --format json $(repositoryName):$(tag) > trivy-scan-result.json
-            displayName: 'Scan Docker Image with Trivy CLI'
+          # - script: |
+          #     docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image --exit-code 0 --no-progress --format json $(repositoryName):$(tag) > trivy-scan-result.json
+          #   displayName: 'Scan Docker Image with Trivy CLI'
 
-          # Publish Trivy scan results as an artifact
-          - task: PublishBuildArtifacts@1
-            inputs:
-              pathToPublish: 'trivy-scan-result.json'
-              artifactName: 'TrivyScanResult'
-              publishLocation: 'Container'
-            displayName: 'Publish Trivy Scan Result'
+          # # Publish Trivy scan results as an artifact
+          # - task: PublishBuildArtifacts@1
+          #   inputs:
+          #     pathToPublish: 'trivy-scan-result.json'
+          #     artifactName: 'TrivyScanResult'
+          #     publishLocation: 'Container'
+          #   displayName: 'Publish Trivy Scan Result'
 
          
           - task: Docker@2
@@ -162,6 +162,7 @@ stages:
               sshEndpoint: 'jesa-med-ssh'
               runOptions: 'commands'
               commands: |
+                set -x
                 docker pull $(repositoryName):$(tag)
                 if [ -n "$(docker ps -a -q -f name=jesa-php-container)" ]; then
                   docker rm -f jesa-php-container
