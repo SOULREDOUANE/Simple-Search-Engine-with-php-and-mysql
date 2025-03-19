@@ -163,8 +163,13 @@ stages:
               runOptions: 'commands'
               commands: |
                 docker pull $(repositoryName):$(tag)
-                docker rm -f jesa-php-container || true
+                if [ -n "$(docker ps -a -q -f name=jesa-php-container)" ]; then
+                  docker rm -f jesa-php-container
+                fi
                 docker run -d --name jesa-php-container -p 8080:80 $(repositoryName):$(tag)
+                # docker pull $(repositoryName):$(tag)
+                # docker rm -f jesa-php-container || true
+                # docker run -d --name jesa-php-container -p 8080:80 $(repositoryName):$(tag)
   - stage: CleanUP_Job_Agent
     condition: always()
     jobs:
