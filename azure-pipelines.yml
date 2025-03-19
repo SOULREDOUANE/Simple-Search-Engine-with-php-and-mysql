@@ -162,10 +162,11 @@ stages:
               sshEndpoint: 'jesa-med-ssh'
               runOptions: 'commands'
               commands: |
-                set -x
-                docker pull $(repositoryName):$(tag)
-                [ -n "$(docker ps -a -q -f name=jesa-php-container)" ] && docker rm -f jesa-php-container
-                docker run -d --name jesa-php-container -p 8080:80 $(repositoryName):$(tag)                
+                bash -c "set -x; docker pull $(repositoryName):$(tag); if [ -n \"\$(docker ps -a -q -f name=jesa-php-container)\" ]; then docker rm -f jesa-php-container; fi; docker run -d --name jesa-php-container -p 8080:80 $(repositoryName):$(tag)"
+                # set -x
+                # docker pull $(repositoryName):$(tag)
+                # [ -n "$(docker ps -a -q -f name=jesa-php-container)" ] && docker rm -f jesa-php-container
+                # docker run -d --name jesa-php-container -p 8080:80 $(repositoryName):$(tag)                
                 # docker pull $(repositoryName):$(tag)
                 # docker rm -f jesa-php-container || true
                 # docker run -d --name jesa-php-container -p 8080:80 $(repositoryName):$(tag)
