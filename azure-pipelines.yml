@@ -160,16 +160,18 @@ stages:
             displayName: 'Deploy to Dev Server'
             inputs:
               sshEndpoint: 'jesa-med-ssh'
-              runOptions: 'commands'
-              commands: |
-                bash -c "set -x; docker pull $(repositoryName):$(tag); if [ -n \"\$(docker ps -a -q -f name=jesa-php-container)\" ]; then docker rm -f jesa-php-container; fi; docker run -d --name jesa-php-container -p 8080:80 $(repositoryName):$(tag)"
-                # set -x
-                # docker pull $(repositoryName):$(tag)
-                # [ -n "$(docker ps -a -q -f name=jesa-php-container)" ] && docker rm -f jesa-php-container
-                # docker run -d --name jesa-php-container -p 8080:80 $(repositoryName):$(tag)                
-                # docker pull $(repositoryName):$(tag)
-                # docker rm -f jesa-php-container || true
-                # docker run -d --name jesa-php-container -p 8080:80 $(repositoryName):$(tag)
+              runOptions: 'inline'
+              inline: |
+                docker pull $(repositoryName):$(tag)
+                if [ -n "$(docker ps -a -q -f name=jesa-php-container)" ]; then
+                  docker rm -f jesa-php-container
+                fi
+                docker run -d --name jesa-php-container -p 8080:80 $(repositoryName):$(tag)
+                 
+              readyTimeout: '20000'
+              
+              
+              
   - stage: CleanUP_Job_Agent
     condition: always()
     jobs:
@@ -189,3 +191,16 @@ stages:
             kubectl delete -f $(System.DefaultWorkingDirectory)/k8s_manifests/agent-job.yml
             kubectl delete -f $(System.DefaultWorkingDirectory)/k8s_manifests/owasp-job.yaml
             kubectl delete cm report-config -n default 
+
+
+
+
+
+# bash -c "set -x; docker pull $(repositoryName):$(tag); if [ -n \"\$(docker ps -a -q -f name=jesa-php-container)\" ]; then docker rm -f jesa-php-container; fi; docker run -d --name jesa-php-container -p 8080:80 $(repositoryName):$(tag)"
+                # set -x
+                # docker pull $(repositoryName):$(tag)
+                # [ -n "$(docker ps -a -q -f name=jesa-php-container)" ] && docker rm -f jesa-php-container
+                # docker run -d --name jesa-php-container -p 8080:80 $(repositoryName):$(tag)                
+                # docker pull $(repositoryName):$(tag)
+                # docker rm -f jesa-php-container || true
+                # docker run -d --name jesa-php-container -p 8080:80 $(repositoryName):$(tag)
