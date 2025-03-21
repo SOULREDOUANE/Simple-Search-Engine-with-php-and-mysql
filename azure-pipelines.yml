@@ -118,7 +118,7 @@ stages:
             env:
               SONAR_SCANNER_OPTS: "-Djavax.net.ssl.checkServerIdentity=false"
             inputs:
-              SonarQube: 'sonarqube-service'
+              SonarQube: 'sonarqube-service' 
               scannerMode: 'MSBuild'
               projectKey: php-projec
               projectName: php-projec
