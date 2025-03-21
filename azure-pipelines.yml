@@ -134,6 +134,9 @@ stages:
           - task: SonarQubeAnalyze@7
             inputs:
               jdkversion: 'JAVA_HOME'
+          - task: SonarQubePublish@7
+            inputs:
+              pollingTimeoutSec: '300'
           
 
           - task: Docker@2
