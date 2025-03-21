@@ -130,8 +130,10 @@ stages:
               projectName: php-projec
               extraProperties: |
                 sonar.sources=.
+                sonar.projectBaseDir=$(System.DefaultWorkingDirectory)
                 sonar.projectKey=php-projec
-                sonar.branch.name=main
+                # sonar.branch.name=main
+
 
           - task: SonarQubeAnalyze@7
             # env:
