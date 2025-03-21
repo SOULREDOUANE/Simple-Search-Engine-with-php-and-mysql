@@ -115,6 +115,8 @@ stages:
           #   displayName: 'Publish SonarQube Scan Output'
           # steps:
           - task: SonarQubePrepare@5
+            env:
+              SONAR_SCANNER_OPTS: "-Djavax.net.ssl.checkServerIdentity=false"
             inputs:
               SonarQube: 'sonarqube-service'
               scannerMode: 'MSBuild'
