@@ -149,12 +149,17 @@ stages:
             continueOnError: true
             
           - script: |
-              echo "Working directory: $(System.DefaultWorkingDirectory)"
-              ls -la $(System.DefaultWorkingDirectory)/.sonarqube || echo ".sonarqube directory not found"
-              ls -la $(System.DefaultWorkingDirectory)/.sonarqube/out || echo "out directory not found"
-              cat $(System.DefaultWorkingDirectory)/.sonarqube/out/*.log || echo "No log files found"
-            displayName: 'Debug: Locate SonarQube Logs'
-
+              # Check the last 10 lines of the pipeline log for Quality Gate status
+              if tail -n 10 "$(System.ArtifactsDirectory)/logs/$(System.JobId).log" | grep -q "Overall Quality Gate status: failed"; then
+                echo "##vso[task.logissue type=error]SonarQube Quality Gate failed."
+                exit 1
+              elif tail -n 10 "$(System.ArtifactsDirectory)/logs/$(System.JobId).log" | grep -q "EXECUTION FAILURE"; then
+                echo "##vso[task.logissue type=error]SonarQube analysis execution failed."
+                exit 1
+              else
+                echo "SonarQube analysis and Quality Gate passed."
+              fi
+            displayName: 'Fail on SonarQube Failure'
           
 
           - task: Docker@2
