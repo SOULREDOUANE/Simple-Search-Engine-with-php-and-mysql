@@ -146,6 +146,16 @@ stages:
           - task: SonarQubePublish@7
             inputs:
               pollingTimeoutSec: '300'
+          - script: |
+              # Check Quality Gate status in SonarQube output
+              if grep -q "Quality Gate: FAILED" "$(System.DefaultWorkingDirectory)/.sonarqube/out/*.log"; then
+                echo "##vso[task.logissue type=error]SonarQube Quality Gate failed."
+                exit 1
+              else
+                echo "Quality Gate passed."
+              fi
+
+            displayName: 'Fail Pipeline on Quality Gate Failure'
           
 
           - task: Docker@2
