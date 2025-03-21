@@ -122,7 +122,7 @@ stages:
           #     scannerMode: 'MSBuild'
           #     projectKey: php-projec
           #     projectName: php-projec
-          - task: SonarQubePrepare@5
+          - task: SonarQubePrepare@7
             inputs:
               SonarQube: 'sonarqube-service'
               scannerMode: 'CLI'
