@@ -126,8 +126,8 @@ stages:
             inputs:
               SonarQube: 'sonarqube-service'
               scannerMode: 'CLI'
-              projectKey: 'php-project'
-              projectName: 'php-project'
+              projectKey: 'php-projec'
+              projectName: 'php-projec'
               extraProperties: |
                 sonar.sources=.
 
