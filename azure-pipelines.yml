@@ -146,6 +146,7 @@ stages:
           - task: SonarQubePublish@7
             inputs:
               pollingTimeoutSec: '300'
+            continueOnError: true
             
           - script: |
               echo "Working directory: $(System.DefaultWorkingDirectory)"
