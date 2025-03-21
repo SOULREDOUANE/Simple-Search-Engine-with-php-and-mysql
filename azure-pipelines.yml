@@ -133,7 +133,10 @@ stages:
                 sonar.projectBaseDir=$(System.DefaultWorkingDirectory)
                 sonar.projectKey=php-projec
                 # sonar.branch.name=main
-
+          - bash: |
+              FILTERED_PARAMS=$(echo $SONARQUBE_SCANNER_PARAMS | sed 's/"sonar.branch.name":"[^"]*"\,//g')
+              echo "##vso[task.setvariable variable=SONARQUBE_SCANNER_PARAMS]$FILTERED_PARAMS"
+            displayName: 'Filter out sonar.branch.name'
 
           - task: SonarQubeAnalyze@7
             # env:
