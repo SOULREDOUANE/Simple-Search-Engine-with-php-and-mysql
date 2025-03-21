@@ -131,6 +131,9 @@ stages:
               extraProperties: |
                 sonar.sources=.
 
+          - task: SonarQubeAnalyze@7
+            inputs:
+              jdkversion: 'JAVA_HOME'
           
 
           - task: Docker@2
