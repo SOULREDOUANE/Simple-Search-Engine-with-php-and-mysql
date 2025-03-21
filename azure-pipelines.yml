@@ -131,6 +131,7 @@ stages:
               extraProperties: |
                 sonar.sources=.
                 sonar.projectKey=php-projec
+                sonar.branch.name=
 
           - task: SonarQubeAnalyze@7
             # env:
