@@ -127,13 +127,14 @@ stages:
               SonarQube: 'sonarqube-service'
               scannerMode: 'cli'
               projectKey: 'php-projec'
-              # projectName: 'php-projec'
-              # extraProperties: |
-              #   sonar.sources=.
+              projectName: 'php-projec'
+              extraProperties: |
+                sonar.sources=.
+                sonar.projectKey='php-projec'
 
           - task: SonarQubeAnalyze@7
-            env:
-              SONAR_SCANNER_OPTS: "-X"
+            # env:
+            #   SONAR_SCANNER_OPTS: "-X"
             inputs:
               jdkversion: 'JAVA_HOME'
           - task: SonarQubePublish@7
