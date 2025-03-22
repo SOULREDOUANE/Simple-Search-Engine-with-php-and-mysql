@@ -205,7 +205,7 @@ stages:
         inputs:
           targetType: 'inline'
           script: |
-            kubectl delete -f $(System.DefaultWorkingDirectory)/k8s_manifests/agent-job.yml
+            # kubectl delete -f $(System.DefaultWorkingDirectory)/k8s_manifests/agent-job.yml
             kubectl delete -f $(System.DefaultWorkingDirectory)/k8s_manifests/owasp-job.yaml
             kubectl delete cm report-config -n default 
 
