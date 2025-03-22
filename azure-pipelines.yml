@@ -145,7 +145,7 @@ stages:
               # Generate Trivy scan report (always succeeds)
               docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v /shared/html.tpl:/tmp/html.tpl aquasec/trivy:latest image --exit-code 0 --no-progress --format template --template "@/tmp/html.tpl" "$(repositoryName):$(tag)" > trivy-scan-result.html
               # Check for HIGH vulnerabilities and fail the build if any are found
-              docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v /shared/html.tpl:/tmp/html.tpl aquasec/trivy:latest image --exit-code 1 --severity HIGH,CRITICAL,Medium 
+              # docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v /shared/html.tpl:/tmp/html.tpl aquasec/trivy:latest image --exit-code 1 --severity HIGH,CRITICAL,Medium 
             displayName: 'Scan Docker Image with Trivy CLI'
 
           # Publish Trivy scan results as an artifact
@@ -155,6 +155,12 @@ stages:
               artifactName: 'TrivyScanResult'
               publishLocation: 'Container'
             displayName: 'Publish Trivy Scan Result'
+          - script: | 
+             # Check for HIGH vulnerabilities and fail the build if any are found
+              docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v /shared/html.tpl:/tmp/html.tpl aquasec/trivy:latest image --exit-code 1 --severity HIGH,CRITICAL,Medium "$(repositoryName):$(tag)"
+            displayName: 'Check for Critical, High and Medium Vulnerabilities '
+
+          
 
          
           - task: Docker@2
