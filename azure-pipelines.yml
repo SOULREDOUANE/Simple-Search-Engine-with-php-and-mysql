@@ -99,18 +99,18 @@ stages:
             - agent.name -equals jesa-med-job-agent
         steps:
          
-          # - task: SonarQubePrepare@7
-          #   inputs:
-          #     SonarQube: 'sonarqube-service'
-          #     scannerMode: 'cli'
-          #     projectKey: php-projec
-          #     projectName: php-projec
-          #     extraProperties: |
-          #       sonar.sources=.
-          #       sonar.projectBaseDir=$(System.DefaultWorkingDirectory)
-          #       sonar.projectKey=php-projec
-          #       sonar.qualitygate.wait=true
-          #       # sonar.branch.name=main
+          - task: SonarQubePrepare@7
+            inputs:
+              SonarQube: 'sonarqube-service'
+              scannerMode: 'cli'
+              projectKey: php-projec
+              projectName: php-projec
+              extraProperties: |
+                sonar.sources=.
+                sonar.projectBaseDir=$(System.DefaultWorkingDirectory)
+                sonar.projectKey=php-projec
+                sonar.qualitygate.wait=true
+                # sonar.branch.name=main
           # - bash: |
           #     FILTERED_PARAMS=$(echo $SONARQUBE_SCANNER_PARAMS | sed 's/"sonar.branch.name":"[^"]*"\,//g')
           #     echo "##vso[task.setvariable variable=SONARQUBE_SCANNER_PARAMS]$FILTERED_PARAMS"
