@@ -157,7 +157,7 @@ stages:
             displayName: 'Publish Trivy Scan Result'
           - script: | 
              # Check for HIGH vulnerabilities and fail the build if any are found
-              docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v /shared/html.tpl:/tmp/html.tpl aquasec/trivy:latest image --exit-code 1 --severity HIGH,CRITICAL,Medium "$(repositoryName):$(tag)"
+              docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v /shared/html.tpl:/tmp/html.tpl aquasec/trivy:latest image --exit-code 1 --severity HIGH,CRITICAL,MEDIUM "$(repositoryName):$(tag)"
             displayName: 'Check for Critical, High and Medium Vulnerabilities '
 
           
