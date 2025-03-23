@@ -52,8 +52,8 @@ if(!isset($_GET['s'])){
     while($data=$sE->results()){
         echo $data['title'];
     }*/
-    #$con = mysqli_connect('79.72.29.179','user','password','search');
-    $con = mysqli_connect('129.151.253.241','root','password','search');
+    #$con = mysqli_connect('129.151.253.241','root','your_password','search');
+    $con = mysqli_connect('129.151.253.241','root','your_password','search');
     $sql = mysqli_query($con, "SELECT * FROM data WHERE title LIKE '%$s%' OR description LIKE '%$s%' OR url LIKE '%$s%' ORDER BY ranking DESC");
     $row = mysqli_num_rows($sql);
     if($row == 0){
