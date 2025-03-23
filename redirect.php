@@ -1,7 +1,7 @@
 <?php
 $url = $_GET['url'];
 // $con = mysqli_connect('localhost:3306','root','','search');
-$con = mysqli_connect('129.151.253.241','root','password','search');
+$con = mysqli_connect('129.151.253.241','root','your_password','search');
 $sql = mysqli_query($con, "SELECT * FROM data WHERE url='$url'");
 $data = mysqli_fetch_array($sql);
 $r = $data['ranking'];
